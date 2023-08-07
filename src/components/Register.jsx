@@ -7,43 +7,52 @@ function Register() {
     password: "",
     dob: "",
   });
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
-  const [dob, setDob] = useState("");
   const [error, setError] = useState("");
 
   function formHandler(e) {
     e.preventDefault();
-    if (!name) {
-      setError("Name Is Required");
+
+    const { name, email, password, dob } = formData;
+
+    if (!name.trim()) {
+      setError("Name is required");
       return;
     }
-    if (!email) {
-      setError("email invalid");
+
+    if (!email.trim() || !emailIsValid(email)) {
+      setError("Invalid email address");
       return;
     }
-    if (!password || password.length < 6) {
-      setError("Password not entered or is less than 6 digits");
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long");
       return;
     }
+
     if (!dob) {
-      setError("dob invalid");
+      setError("Date of Birth is required");
       return;
     }
-    if (dob && email && password && name) {
-      setError("");
-    }
-    setFormData({
+
+    setError("");
+
+    const userData = {
       name: name,
       email: email,
       password: password,
       dob: dob,
-    });
-    localStorage.setItem("user", formData);
+    };
+
+    localStorage.setItem("user", JSON.stringify(userData));
+
     window.location.href = "/#/login";
 
-    console.log(formData);
+    console.log(userData);
+  }
+
+  function emailIsValid(email) {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
   }
 
   return (
@@ -52,15 +61,12 @@ function Register() {
       <form onSubmit={formHandler}>
         {error && <div>{error}</div>}
         <div>
-          {" "}
           <span>Name:</span>
           <input
             type="text"
-            value={name}
+            value={formData.name}
             name="name"
-            onChange={(e) => {
-              setName(e.target.value);
-            }}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           />
         </div>
 
@@ -68,11 +74,9 @@ function Register() {
           <span>Email:</span>
           <input
             type="email"
-            value={email}
+            value={formData.email}
             name="email"
-            onChange={(e) => {
-              setEmail(e.target.value);
-            }}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           />
         </div>
 
@@ -80,24 +84,19 @@ function Register() {
           <span>Password:</span>
           <input
             type="password"
-            value={password}
+            value={formData.password}
             name="password"
-            onChange={(e) => {
-              setPassword(e.target.value);
-            }}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
           />
         </div>
 
         <div>
-          {" "}
-          <span>Dob:</span>
+          <span>Date of Birth:</span>
           <input
             type="date"
-            value={dob}
+            value={formData.dob}
             name="dob"
-            onChange={(e) => {
-              setDob(e.target.value);
-            }}
+            onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
           />
         </div>
         <button type="submit">Register</button>
